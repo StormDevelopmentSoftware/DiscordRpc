@@ -8,7 +8,7 @@ namespace DiscordRpc.Entities
 	public class RpcDispatch
 	{
 		/// <summary>
-		/// Command.
+		/// Command Type.
 		/// </summary>
 		[JsonProperty("cmd")]
 		public string Command { get; set; }
@@ -36,5 +36,12 @@ namespace DiscordRpc.Entities
 		/// </summary>
 		[JsonProperty("evt", NullValueHandling = NullValueHandling.Ignore)]
 		public string Event { get; set; }
+
+		/// <summary>
+		/// Convert dispatch to json.
+		/// </summary>
+		/// <returns></returns>
+		public string ToJson()
+			=> JsonConvert.SerializeObject(this, Formatting.None);
 	}
 }

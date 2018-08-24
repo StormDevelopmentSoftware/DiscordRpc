@@ -12,6 +12,12 @@ namespace DiscordRpc
 		private object LogEventLocker = new object();
 		private object ReadyEventLocker = new object();
 
+		public RpcClient(ulong applicationId, bool registerApp = false, string executablePath = null)
+		{
+			if (Environment.OSVersion.Platform != PlatformID.Win32NT && registerApp)
+				throw new InvalidOperationException("Cannot use Microsoft Windows Registry from non windows platform.");
+		}
+
 		public event LogMessageEventHandler LogMessageReceived {
 			add => handlers.AddHandler(LogEventLocker, value);
 			remove => handlers.RemoveHandler(LogEventLocker, value);

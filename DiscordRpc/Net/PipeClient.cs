@@ -1,8 +1,12 @@
-﻿using DiscordRpc.Entities;
+﻿using DiscordRpc.Attributes;
+using DiscordRpc.Entities;
 using DiscordRpc.EventArgs;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -34,7 +38,18 @@ namespace DiscordRpc.Net
 		/// </summary>
 		public void Connect()
 		{
-			stream.Connect(5000);
+			try
+			{
+				stream.Connect(5000);
+				Thread.Sleep(1500);
+
+				if (stream.IsConnected)
+					rpc.RaiseLogMessageReceivedEvent(this, new LogMessageEventArgs($"Pipe connection estabilished! Connected to pipe: {name}"));
+			}
+			catch(Exception ex)
+			{
+				rpc.RaiseLogMessageReceivedEvent(this, new LogMessageEventArgs($"Pipe connection failed! Attempting next ipc pipe.\n{ex.ToString()}", LogLevel.Fatal));
+			}
 		}
 
 		/// <summary>
@@ -66,7 +81,29 @@ namespace DiscordRpc.Net
 			var buf = packet.GetBytes();
 			stream.Write(buf, 0, buf.Length);
 
-			rpc.RaiseLogMessageReceivedEvent(this, new LogMessageEventArgs("Sent", LogLevel.Debug));
+			rpc.RaiseLogMessageReceivedEvent(this, new LogMessageEventArgs($"Wrote frame with opcode: {packet.OpCode}, with data:\n{JsonConvert.SerializeObject(packet.GetData())}", LogLevel.Debug));
+		}
+		
+		/// <summary>
+		/// Dispatches a command with arguments to pipe.
+		/// </summary>
+		/// <param name="command">The command to execute</param>
+		/// <param name="args"></param>
+		public void DispatchCommand(RpcCommand command, object args = null)
+		{
+			var cmd = (CommandAttribute)command.GetType()
+				.GetCustomAttributes(typeof(CommandAttribute))
+				.FirstOrDefault();
+
+			var dispatch = new RpcDispatch();
+			dispatch.Command = cmd.Name;
+			dispatch.Arguments = args;
+
+			var packet = new RpcPacket();
+			packet.OpCode = RpcOpCode.Frame;
+			packet.SetData(dispatch.ToJson());
+
+			Write(packet);
 		}
     }
 }
