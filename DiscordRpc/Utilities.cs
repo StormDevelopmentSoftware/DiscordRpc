@@ -60,5 +60,31 @@ namespace DiscordRpc
 
 			return null;
 		}
+
+		public static RpcEvent? GetEvent(string name)
+		{
+			foreach (RpcEvent evt in Enum.GetValues(typeof(RpcCommand)))
+			{
+				var attr = (DescriptionAttribute)evt.GetType()
+					.GetCustomAttributes(typeof(DescriptionAttribute), false)
+					.FirstOrDefault();
+
+				if (attr != null && attr.Description == name)
+					return evt;
+			}
+			return null;
+		}
+
+		public static string GetEventName(this RpcEvent evt)
+		{
+			var attr = (DescriptionAttribute)evt.GetType()
+				.GetCustomAttributes(typeof(DescriptionAttribute), false)
+				.FirstOrDefault();
+
+			if (attr != null)
+				return attr.Description;
+
+			return null;
+		}
 	}
 }

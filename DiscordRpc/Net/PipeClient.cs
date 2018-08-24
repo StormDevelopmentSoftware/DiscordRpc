@@ -1,5 +1,4 @@
-﻿using DiscordRpc.Attributes;
-using DiscordRpc.Entities;
+﻿using DiscordRpc.Entities;
 using DiscordRpc.EventArgs;
 using Newtonsoft.Json;
 using System;
