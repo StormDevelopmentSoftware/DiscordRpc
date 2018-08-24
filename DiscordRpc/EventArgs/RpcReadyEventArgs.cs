@@ -3,11 +3,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using EventArgv = System.EventArgs;
 
 namespace DiscordRpc.EventArgs
 {
-	public class RpcReadyEventArgs : EventArgv
+	public class RpcReadyEventArgs : System.EventArgs
 	{
 		[JsonProperty("v")]
 		public int Version { get; internal set; }

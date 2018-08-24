@@ -1,6 +1,10 @@
-﻿using System;
+﻿using DiscordRpc.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
+using System.Reflection;
+using System.ComponentModel;
 
 namespace DiscordRpc
 {
@@ -29,6 +33,32 @@ namespace DiscordRpc
 		{
 			return new DateTime(1970, 1, 1, 0, 0, 0)
 				.AddSeconds(timestamp);
+		}
+
+		public static RpcCommand? GetCommand(string name)
+		{
+			foreach(RpcCommand cmd in Enum.GetValues(typeof(RpcCommand)))
+			{
+				var attr = (DescriptionAttribute)cmd.GetType()
+					.GetCustomAttributes(typeof(DescriptionAttribute), false)
+					.FirstOrDefault();
+
+				if (attr != null && attr.Description == name)
+					return cmd;
+			}
+			return null;
+		}
+
+		public static string GetCommandName(this RpcCommand command)
+		{
+			var attr = (DescriptionAttribute)command.GetType()
+				.GetCustomAttributes(typeof(DescriptionAttribute), false)
+				.FirstOrDefault();
+
+			if (attr != null)
+				return attr.Description;
+
+			return null;
 		}
 	}
 }
