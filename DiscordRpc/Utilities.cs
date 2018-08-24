@@ -4,6 +4,9 @@ using System.Text;
 
 namespace DiscordRpc
 {
+	/// <summary>
+	/// Represents an utility class.
+	/// </summary>
 	public static class Utilities
 	{
 		/// <summary>
