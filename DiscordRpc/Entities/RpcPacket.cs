@@ -13,7 +13,7 @@ namespace DiscordRpc.Entities
 		/// <summary>
 		/// Buffer Data
 		/// </summary>
-		public byte[] Data { get; internal set; }
+		public byte[] Data { get; private set; }
 
 		/// <summary>
 		/// Buffer Length
@@ -56,6 +56,9 @@ namespace DiscordRpc.Entities
 		/// <param name="buffer">Byte array input buffer</param>
 		public static explicit operator RpcPacket(byte[] buffer)
 		{
+			if (buffer == null)
+				throw new ArgumentNullException(nameof(buffer), "Buffer cannot be null!");
+
 			var packet = new RpcPacket();
 			{
 				byte[] opcode = new byte[4],
