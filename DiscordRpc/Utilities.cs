@@ -93,7 +93,7 @@ namespace DiscordRpc
 
 		public static void RegisterAppWin(RpcClient client, RpcClientConfiguration cfg)
 		{
-#if NETCOREAPP2_0
+#if NETCOREAPP2_0 || NETSTANDARD2_0
 			throw new PlatformNotSupportedException(".NET Core does not have support to Mincrosoft Windows Registry.");
 #else
 			var key = Registry.ClassesRoot.OpenSubKey($"discord-{cfg.ApplicationId}");
