@@ -6,7 +6,9 @@ using System.Text;
 
 namespace DiscordRpc.EventArgs
 {
-	public class RpcReadyEventArgs : System.EventArgs
+	public delegate void ReadyEventHandler(ReadyEventArgs e);
+
+	public class ReadyEventArgs : System.EventArgs
 	{
 		[JsonProperty("v")]
 		public int Version { get; internal set; }
@@ -16,5 +18,8 @@ namespace DiscordRpc.EventArgs
 
 		[JsonProperty("user")]
 		public RpcUser User { get; internal set; }
+
+		[JsonIgnore]
+		public RpcClient Client { get; internal set; }
 	}
 }

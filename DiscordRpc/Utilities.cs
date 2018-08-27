@@ -6,6 +6,10 @@ using System.Linq;
 using System.Reflection;
 using System.ComponentModel;
 
+#if !NETCOREAPP2_0
+using Microsoft.Win32;
+#endif
+
 namespace DiscordRpc
 {
 	/// <summary>
@@ -85,6 +89,34 @@ namespace DiscordRpc
 				return attr.Description;
 
 			return null;
+		}
+
+		public static void RegisterAppWin(RpcClient client, RpcClientConfiguration cfg)
+		{
+#if NETCOREAPP2_0
+			throw new PlatformNotSupportedException(".NET Core does not have support to Mincrosoft Windows Registry.");
+#else
+			var key = Registry.ClassesRoot.OpenSubKey($"discord-{cfg.ApplicationId}");
+			
+			if(key != null)
+				Registry.ClassesRoot.DeleteSubKeyTree($"discord-{cfg.ApplicationId}");
+
+			key = Registry.ClassesRoot.CreateSubKey($"discord-{cfg.ApplicationId}");
+			key.SetValue(string.Empty, $"URL: Run Game {cfg.ApplicationId} Protocol");
+			key.SetValue("URL Protocol", string.Empty);
+
+			var command = key.CreateSubKey(@"shell\open\command");
+			command.SetValue(string.Empty, cfg.ExecutablePath);
+
+			var icon = key.CreateSubKey("DefaultIcon");
+			icon.SetValue(string.Empty, cfg.ExecutablePath);
+
+			icon.Close();
+			command.Close();
+			key.Close();
+
+			client.RaiseLogEvent(client, LogLevel.Info, "Registered registry key for this app.");
+#endif
 		}
 	}
 }

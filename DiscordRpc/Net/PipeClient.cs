@@ -44,11 +44,11 @@ namespace DiscordRpc.Net
 				Thread.Sleep(1500);
 
 				if (stream.IsConnected)
-					rpc.RaiseLogMessageReceivedEvent(this, new LogMessageEventArgs($"Pipe connection estabilished! Connected to pipe: {name}"));
+					rpc.RaiseLogEvent(this, LogLevel.Info, $"Pipe connection estabilished! Connected to pipe: {name}");
 			}
 			catch (Exception ex)
 			{
-				rpc.RaiseLogMessageReceivedEvent(this, new LogMessageEventArgs($"Pipe connection failed! Attempting next ipc pipe.\n{ex.ToString()}", LogLevel.Fatal));
+				rpc.RaiseLogEvent(this, LogLevel.Fatal, $"Pipe connection failed! Attempting next ipc pipe.\n{ex.ToString()}");
 			}
 		}
 
@@ -81,7 +81,7 @@ namespace DiscordRpc.Net
 			var buf = packet.GetBytes();
 			stream.Write(buf, 0, buf.Length);
 
-			rpc.RaiseLogMessageReceivedEvent(this, new LogMessageEventArgs($"Wrote frame with opcode: {packet.OpCode}, with data:\n{JsonConvert.SerializeObject(packet.GetData())}", LogLevel.Debug));
+			rpc.RaiseLogEvent(this, LogLevel.Debug, $"Wrote frame with opcode: {packet.OpCode}, with data:\n{JsonConvert.SerializeObject(packet.GetData())}");
 		}
 
 		/// <summary>
@@ -99,6 +99,7 @@ namespace DiscordRpc.Net
 			packet.OpCode = RpcOpCode.Frame;
 			packet.SetData(dispatch.ToJson());
 
+			rpc.RaiseLogEvent(this, LogLevel.Debug, $"Dispatching command {command.GetCommandName()}");
 			Write(packet);
 		}
 	}
